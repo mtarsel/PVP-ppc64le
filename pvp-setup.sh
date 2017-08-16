@@ -20,11 +20,11 @@ modprobe vfio-pci
 ppc64_cpu --smt=off
 
 echo 'DPDK_OPTIONS="-c 10101 -n 4 --socket-mem 1024,0"' >> /etc/sysconfig/openvswitch
-#ovs-vsctl set Open_vSwitch . other_config:pmd-cpu-mask=10101
-#ovs-vsctl --no-wait  set Open_vSwitch . other_config:dpdk-socket-mem="1024"
-
 systemctl restart openvswitch
- ovs-vsctl get Open_vSwitch . iface_types # should see some dpdk stuff
+ovs-vsctl set Open_vSwitch . other_config:pmd-cpu-mask=10101
+ovs-vsctl --no-wait  set Open_vSwitch . other_config:dpdk-socket-mem="1024"
+
+ovs-vsctl get Open_vSwitch . iface_types # should see some dpdk stuff
 
 #2 ways do the same. RH uses driverctl
 driverctl set-override 0002:01:00.0 vfio-pci
