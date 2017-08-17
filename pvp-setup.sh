@@ -8,6 +8,10 @@
 # MASK=1 # hexadecimal mask value, 1 correspond to CPU0
 # for I in `ls -d /proc/irq/[0-9]*` ; do echo $MASK > ${I}/smp_affinity ; done
 
+	pcis=$(lspci | grep XL | cut -d ' ' -f1 | cut -d$'\n' -f1)
+	pci1=$(echo $pcis | cut -d ' ' -f1)
+	pci2=$(echo $pcis | cut -d ' ' -f2)
+
 systemctl stop irqbalance
 
 sysctl -w vm.nr_hugepages=2048
@@ -24,18 +28,27 @@ systemctl restart openvswitch
 ovs-vsctl set Open_vSwitch . other_config:pmd-cpu-mask=10101
 ovs-vsctl --no-wait  set Open_vSwitch . other_config:dpdk-socket-mem="1024"
 
-ovs-vsctl get Open_vSwitch . iface_types # should see some dpdk stuff
+if ! ovs-vsctl get Open_vSwitch . iface_types | grep -q "dpdk"; then
+	echo "****ERROR**** dpdk not configured in OVS."
+	echo "EXITING NOW"
+	exit 1
+fi
+
+#get PCI slot ids for Intel i40e XL710
+pcis=$(lspci | grep XL | cut -d ' ' -f1 | cut -d$'\n' -f1)
+pci1=$(echo $pcis | cut -d ' ' -f1)
+pci2=$(echo $pcis | cut -d ' ' -f2)
 
 #2 ways do the same. RH uses driverctl
-driverctl set-override 0002:01:00.0 vfio-pci
-driverctl set-override 0002:01:00.1 vfio-pci
+driverctl set-override $pci1 vfio-pci
+driverctl set-override $pci2 vfio-pci
 #dpdk-devbind --bind=vfio-pci 0002:01:00.1
 #or dpdk-devbind --bind=vfio-pci 0002:01:00.0
 
 #setup ovs
 ovs-vsctl add-br br0 -- set bridge br0 datapath_type=netdev
-ovs-vsctl add-port br0 dpdk0 -- set Interface dpdk0 type=dpdk options:dpdk-devargs=0002:01:00.0 ofport_request=10 
-ovs-vsctl add-port br0 dpdk1 -- set Interface dpdk1 type=dpdk options:dpdk-devargs=0002:01:00.1 ofport_request=11
+ovs-vsctl add-port br0 dpdk0 -- set Interface dpdk0 type=dpdk options:dpdk-devargs=$pci1 ofport_request=10 
+ovs-vsctl add-port br0 dpdk1 -- set Interface dpdk1 type=dpdk options:dpdk-devargs=$pci2 ofport_request=11
 
 #Delete default flow and add two flows to forward packets between the physical devices.
 ovs-ofctl del-flows br0
