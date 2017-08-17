@@ -10,6 +10,7 @@
 
 systemctl stop irqbalance
 
+#TODO - check /proc/meminfo | grep Huge
 sysctl -w vm.nr_hugepages=2048
 
 if ! getenforce | grep -q "Permissive\|Disabled";then
