@@ -28,6 +28,7 @@ ppc64_cpu --smt=off
 echo 'DPDK_OPTIONS="-c 10101 -n 4 --socket-mem 1024,0"' >> /etc/sysconfig/openvswitch
 systemctl restart openvswitch
 sleep 2
+#TODO make sure it starts! pgrep "ovs-vswitchd"
 ovs-vsctl set Open_vSwitch . other_config:pmd-cpu-mask=10101
 ovs-vsctl --no-wait  set Open_vSwitch . other_config:dpdk-socket-mem="1024"
 
