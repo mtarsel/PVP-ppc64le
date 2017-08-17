@@ -8,16 +8,21 @@
 # MASK=1 # hexadecimal mask value, 1 correspond to CPU0
 # for I in `ls -d /proc/irq/[0-9]*` ; do echo $MASK > ${I}/smp_affinity ; done
 
-	pcis=$(lspci | grep XL | cut -d ' ' -f1 | cut -d$'\n' -f1)
-	pci1=$(echo $pcis | cut -d ' ' -f1)
-	pci2=$(echo $pcis | cut -d ' ' -f2)
+pcis=$(lspci | grep XL | cut -d ' ' -f1 | cut -d$'\n' -f1)
+pci1=$(echo $pcis | cut -d ' ' -f1)
+pci2=$(echo $pcis | cut -d ' ' -f2)
 
 systemctl stop irqbalance
 
 sysctl -w vm.nr_hugepages=2048
 
-#TODO selinux
-#selinux is already disabled
+if ! getenforce | grep -q "Permissive\|Disabled";then
+        echo "selinux is enabled"
+	echo "Please change entry in /etc/selinux/config file and run:"
+	echo "\t setenforce Permissive"
+	echo "EXITING NOW"
+	exit 0
+fi
 
 modprobe vfio-pci
 
@@ -25,6 +30,7 @@ ppc64_cpu --smt=off
 
 echo 'DPDK_OPTIONS="-c 10101 -n 4 --socket-mem 1024,0"' >> /etc/sysconfig/openvswitch
 systemctl restart openvswitch
+sleep 2
 ovs-vsctl set Open_vSwitch . other_config:pmd-cpu-mask=10101
 ovs-vsctl --no-wait  set Open_vSwitch . other_config:dpdk-socket-mem="1024"
 
@@ -64,6 +70,8 @@ ovs-vsctl add-port br0 vhost1 \
 #setup the guest
 #RH uses .dsk but we need to upgrade qemu to >2.7 to use vhost-user-client ports
 #TODO vim /etc/libvirt/qemu.conf 
+	#user = "root"
+	#group = "root"
 
 virsh define ./pvp-guest-rhel.xml
 
