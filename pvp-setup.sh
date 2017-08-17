@@ -8,10 +8,6 @@
 # MASK=1 # hexadecimal mask value, 1 correspond to CPU0
 # for I in `ls -d /proc/irq/[0-9]*` ; do echo $MASK > ${I}/smp_affinity ; done
 
-pcis=$(lspci | grep XL | cut -d ' ' -f1 | cut -d$'\n' -f1)
-pci1=$(echo $pcis | cut -d ' ' -f1)
-pci2=$(echo $pcis | cut -d ' ' -f2)
-
 systemctl stop irqbalance
 
 sysctl -w vm.nr_hugepages=2048
