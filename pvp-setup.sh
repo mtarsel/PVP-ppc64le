@@ -29,8 +29,12 @@ echo 'DPDK_OPTIONS="-c 10101 -n 4 --socket-mem 1024,0"' >> /etc/sysconfig/openvs
 systemctl restart openvswitch
 sleep 2
 
-
-
+if [ $(pgrep ovs | wc -l) -eq 0 ];then
+	echo "****ERROR**** OVS not started after reboot"
+	echo "EXITING NOW"
+	exit 1
+fi
+	
 #TODO make sure it starts! pgrep "ovs-vswitchd"
 ovs-vsctl set Open_vSwitch . other_config:pmd-cpu-mask=10101
 ovs-vsctl --no-wait  set Open_vSwitch . other_config:dpdk-socket-mem="1024"
@@ -51,7 +55,6 @@ driverctl set-override $pci1 vfio-pci
 driverctl set-override $pci2 vfio-pci
 #dpdk-devbind --bind=vfio-pci 0002:01:00.1
 #or dpdk-devbind --bind=vfio-pci 0002:01:00.0
-#TODO verify vfio in output
 if [ $(driverctl list-devices | grep vfio-pci | wc -l) -eq 0 ]; then
 	echo "****ERROR**** vfio not configured"
 	echo "$pci1 and/or $pci2 are not configured with vfio"
