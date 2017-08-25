@@ -71,7 +71,7 @@ ovs-vsctl add-port br0 vhost1 \
 	#user = "root"
 	#group = "root"
 
-virsh define ./pvp-guest-rhel.xml
+virsh define ./guest-pvp-rhel.xml
 
 #Single direction:
 ovs-ofctl add-flow br0 in_port=10,actions=20

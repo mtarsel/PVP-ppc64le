@@ -1,0 +1,105 @@
+<domain type='kvm'>
+  <name>pvp</name>
+  <memory unit='KiB'>2097152</memory>
+  <currentMemory unit='KiB'>2097152</currentMemory>
+  <memoryBacking>
+    <hugepages>
+      <page size='16384' unit='KiB' nodeset='0-1'/>
+    </hugepages>
+  </memoryBacking>
+  <vcpu placement='static'>16</vcpu>
+  <os>
+    <type arch='ppc64le' machine='pseries'>hvm</type>
+    <boot dev='hd'/>
+    <boot dev='cdrom'/>
+    <boot dev='network'/>
+  </os>
+  <cpu>
+    <numa>
+      <cell id='0' cpus='0' memory='1048576' unit='KiB' memAccess='shared'/>
+      <cell id='1' cpus='1' memory='1048576' unit='KiB' memAccess='shared'/>
+    </numa>
+  </cpu>
+  <clock offset='utc'/>
+  <on_poweroff>destroy</on_poweroff>
+  <on_reboot>restart</on_reboot>
+  <on_crash>destroy</on_crash>
+  <devices>
+    <emulator>/usr/libexec/qemu-kvm</emulator>
+    <disk type='file' device='disk'>
+      <driver name='qemu' type='raw'/>
+      <source file='/home/gowri/rhel-74.img'/>
+      <target dev='vda' bus='virtio'/>
+    </disk>
+    <disk type='file' device='cdrom'>
+      <driver name='qemu' type='raw'/>
+      <source file='/home/gowri/rhel-ga-74.iso'/>
+      <target dev='sda' bus='scsi'/>
+      <readonly/>
+      <address type='drive' controller='0' bus='0' target='0' unit='0'/>
+    </disk>
+    <controller type='usb' index='0' model='nec-xhci'>
+      <address type='pci' domain='0x0000' bus='0x00' slot='0x02' function='0x0'/>
+    </controller>
+    <controller type='pci' index='0' model='pci-root'/>
+    <controller type='scsi' index='0'>
+      <address type='spapr-vio' reg='0x2000'/>
+    </controller>
+    <controller type='virtio-serial' index='0'>
+      <address type='pci' domain='0x0000' bus='0x00' slot='0x03' function='0x0'/>
+    </controller>
+    <interface type='network'>
+      <mac address='00:16:3e:1a:b3:4a'/>
+      <source network='default'/>
+      <model type='virtio'/>
+      <address type='pci' domain='0x0000' bus='0x00' slot='0x08' function='0x0'/>
+    </interface>
+    <interface type='vhostuser'>
+      <mac address='52:54:00:33:fc:5e'/>
+      <source type='unix' path='/var/run/openvswitch/vhost0' mode='client'/>
+      <model type='virtio'/>
+      <driver name='vhost' queues='4'>
+        <host mrg_rxbuf='off'/>
+      </driver>
+      <address type='pci' domain='0x0000' bus='0x00' slot='0x01' function='0x0'/>
+    </interface>
+    <interface type='vhostuser'>
+      <mac address='52:54:00:33:fc:5f'/>
+      <source type='unix' path='/var/run/openvswitch/vhost1' mode='client'/>
+      <model type='virtio'/>
+      <driver name='vhost' queues='4'>
+        <host mrg_rxbuf='off'/>
+      </driver>
+      <address type='pci' domain='0x0000' bus='0x00' slot='0x07' function='0x0'/>
+    </interface>
+    <serial type='pty'>
+      <target port='0'/>
+      <address type='spapr-vio' reg='0x30000000'/>
+    </serial>
+    <console type='pty'>
+      <target type='serial' port='0'/>
+      <address type='spapr-vio' reg='0x30000000'/>
+    </console>
+    <channel type='unix'>
+      <target type='virtio' name='org.qemu.guest_agent.0'/>
+      <address type='virtio-serial' controller='0' bus='0' port='1'/>
+    </channel>
+    <input type='keyboard' bus='usb'>
+      <address type='usb' bus='0' port='1'/>
+    </input>
+    <input type='mouse' bus='usb'>
+      <address type='usb' bus='0' port='2'/>
+    </input>
+    <graphics type='vnc' port='-1' autoport='yes'>
+      <listen type='address'/>
+    </graphics>
+    <video>
+      <model type='vga' vram='16384' heads='1' primary='yes'/>
+      <address type='pci' domain='0x0000' bus='0x00' slot='0x06' function='0x0'/>
+    </video>
+    <memballoon model='virtio'>
+      <address type='pci' domain='0x0000' bus='0x00' slot='0x05' function='0x0'/>
+    </memballoon>
+    <panic model='pseries'/>
+  </devices>
+</domain>
