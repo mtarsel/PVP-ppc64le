@@ -29,13 +29,19 @@ echo 'DPDK_OPTIONS="-c 10101 -n 4 --socket-mem 1024,0"' >> /etc/sysconfig/openvs
 systemctl restart openvswitch
 sleep 2
 
+if ! systemctl is-active openvswitch > /dev/null; then
+	echo "****ERROR**** OVS service not started after reboot"
+	echo "EXITING NOW"
+	exit 1
+fi
+
+
 if [ $(pgrep ovs | wc -l) -eq 0 ];then
-	echo "****ERROR**** OVS not started after reboot"
+	echo "****ERROR**** OVS processes not started"
 	echo "EXITING NOW"
 	exit 1
 fi
 	
-#TODO make sure it starts! pgrep "ovs-vswitchd"
 ovs-vsctl set Open_vSwitch . other_config:pmd-cpu-mask=10101
 ovs-vsctl --no-wait  set Open_vSwitch . other_config:dpdk-socket-mem="1024"
 
