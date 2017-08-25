@@ -9,9 +9,12 @@
 # for I in `ls -d /proc/irq/[0-9]*` ; do echo $MASK > ${I}/smp_affinity ; done
 
 systemctl stop irqbalance
+echo "\n irqbalance stopped\n"
 
 #TODO - check /proc/meminfo | grep Huge
 sysctl -w vm.nr_hugepages=2048
+
+echo "\nHugepages set\n"
 
 if ! getenforce | grep -q "Permissive\|Disabled";then
         echo "selinux is enabled"
@@ -21,11 +24,20 @@ if ! getenforce | grep -q "Permissive\|Disabled";then
 	exit 0
 fi
 
+echo "\nselinux is ok\n"
+
 modprobe vfio-pci
+
+echo "\nvfio module loaded\n"
 
 ppc64_cpu --smt=off
 
+echo "\nsmt off\n"
+
 echo 'DPDK_OPTIONS="-c 10101 -n 4 --socket-mem 1024,0"' >> /etc/sysconfig/openvswitch
+
+echo "\n options written to ovs config. restarting now....\n"
+
 systemctl restart openvswitch
 sleep 2
 
@@ -41,7 +53,9 @@ if [ $(pgrep ovs | wc -l) -eq 0 ];then
 	echo "EXITING NOW"
 	exit 1
 fi
-	
+
+echo "\nadding ovs options via cmdline\n"
+
 ovs-vsctl set Open_vSwitch . other_config:pmd-cpu-mask=10101
 ovs-vsctl --no-wait  set Open_vSwitch . other_config:dpdk-socket-mem="1024"
 
@@ -50,6 +64,8 @@ if ! ovs-vsctl get Open_vSwitch . iface_types | grep -q "dpdk"; then
 	echo "EXITING NOW"
 	exit 1
 fi
+
+echo "\ngetting pci slots and setting override\n"
 
 #get PCI slot ids for Intel i40e XL710
 pcis=$(lspci | grep XL | cut -d ' ' -f1 | cut -d$'\n' -f1)
@@ -67,6 +83,9 @@ if [ $(driverctl list-devices | grep vfio-pci | wc -l) -eq 0 ]; then
 	echo "EXITING NOW"
 	exit 1
 fi	
+
+echo"\nadding bridges, ports, and flows to OVS\n"
+#TODO before we configure this maybe grab the bridge test from runall
 
 #setup ovs
 ovs-vsctl add-br br0 -- set bridge br0 datapath_type=netdev
@@ -89,8 +108,11 @@ ovs-vsctl add-port br0 vhost1 \
 #TODO vim /etc/libvirt/qemu.conf 
 	#user = "root"
 	#group = "root"
+echo "\ndefine gust via XML\n"
 
 virsh define ./guest-pvp-rhel.xml
+
+echo "\nadding more flowss\n"
 
 #Single direction:
 ovs-ofctl add-flow br0 in_port=10,actions=20
@@ -99,5 +121,4 @@ ovs-ofctl add-flow br0 in_port=21,actions=11
 ovs-ofctl add-flow br0 in_port=11,actions=21
 ovs-ofctl add-flow br0 in_port=20,actions=10
 
-echo ""
-echo "done"
+echo "\ndone."
