@@ -7,6 +7,19 @@
 # Pin all interrupts on CPU0 for better test results- I did not do this
 # MASK=1 # hexadecimal mask value, 1 correspond to CPU0
 # for I in `ls -d /proc/irq/[0-9]*` ; do echo $MASK > ${I}/smp_affinity ; done
+is_OVS_running(){
+
+	ovsstatus=$(systemctl is-active openvswitch)
+
+	if [ $ovsstatus == 'inactive' ]; then
+		echo -e "\n****ERROR**** OVS service is $ovsstatus"
+		echo "EXITING NOW"
+		exit 1
+	fi
+}
+
+is_OVS_running
+echo -e "\nStarting script now..."
 
 systemctl stop irqbalance
 echo -e "\n irqbalance stopped\n"
@@ -41,12 +54,7 @@ echo -e "\n options written to ovs config. restarting now....\n"
 systemctl restart openvswitch
 sleep 2
 
-if ! systemctl is-active openvswitch > /dev/null; then
-	echo "****ERROR**** OVS service not started after reboot"
-	echo "EXITING NOW"
-	exit 1
-fi
-
+is_OVS_running
 
 if [ $(pgrep ovs | wc -l) -eq 0 ];then
 	echo "****ERROR**** OVS processes not started"
