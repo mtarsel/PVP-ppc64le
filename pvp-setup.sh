@@ -52,7 +52,7 @@ driverctl set-override $pci2 vfio-pci
 #dpdk-devbind --bind=vfio-pci 0002:01:00.1
 #or dpdk-devbind --bind=vfio-pci 0002:01:00.0
 #TODO verify vfio in output
-if [ $(driverctl list-devices | grep vfio-pci | wc -l) -ne 0 ]; then
+if [ $(driverctl list-devices | grep vfio-pci | wc -l) -eq 0 ]; then
 	echo "****ERROR**** vfio not configured"
 	echo "$pci1 and/or $pci2 are not configured with vfio"
 	echo "EXITING NOW"
