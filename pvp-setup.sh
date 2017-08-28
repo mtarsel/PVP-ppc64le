@@ -19,7 +19,7 @@ is_OVS_running(){
 }
 
 is_OVS_running
-echo -e "\nStarting script now..."
+echo -e "\n Starting script now..."
 
 systemctl stop irqbalance
 echo -e "\n irqbalance stopped\n"
@@ -92,7 +92,7 @@ if [ $(driverctl list-devices | grep vfio-pci | wc -l) -eq 0 ]; then
 	exit 1
 fi	
 
-echo"\nadding bridges, ports, and flows to OVS\n"
+echo "\n adding bridges, ports, and flows to OVS\n"
 #TODO before we configure this maybe grab the bridge test from runall
 
 #setup ovs
