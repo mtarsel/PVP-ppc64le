@@ -1,6 +1,7 @@
 #!/bin/bash
 #Written by Mick Tarsel
 #setup PVP for ppc64le to test dpdk with ovs
+# Currently does not do anything with the guest but define it... must configure guest manually
 
 #grubby  --args="hugepages=2048 isolcpus=8,16 numa=off intel_iommu=on" --update-kernel /boot/vmlinuz-3.10.0-675.el7.ppc64le 
 
