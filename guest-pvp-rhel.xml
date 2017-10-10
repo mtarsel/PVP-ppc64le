@@ -4,16 +4,10 @@
   <currentMemory unit='KiB'>3145728</currentMemory>
   <memoryBacking>
     <hugepages>
-      <page size='1048576' unit='KiB' nodeset='0'/>
+      <page size='16384' unit='KiB' nodeset='0'/>
     </hugepages>
   </memoryBacking>
   <vcpu placement='static'>3</vcpu>
-    <cputune>
-    <vcpupin vcpu='0' cpuset='1'/>
-    <vcpupin vcpu='1' cpuset='6'/>
-    <vcpupin vcpu='2' cpuset='7'/>
-    <emulatorpin cpuset='0'/>
-  </cputune>
   <os>
     <type arch='ppc64le' machine='pseries'>hvm</type>
     <boot dev='hd'/>
