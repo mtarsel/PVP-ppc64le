@@ -81,8 +81,8 @@ pci1=$(echo $pcis | cut -d ' ' -f1)
 pci2=$(echo $pcis | cut -d ' ' -f2)
 
 #2 ways do the same. RH uses driverctl
-driverctl set-override $pci1 vfio-pci
-driverctl set-override $pci2 vfio-pci
+#driverctl set-override $pci1 vfio-pci
+#driverctl set-override $pci2 vfio-pci
 #dpdk-devbind --bind=vfio-pci 0002:01:00.1
 #or dpdk-devbind --bind=vfio-pci 0002:01:00.0
 if [ $(driverctl list-devices | grep vfio-pci | wc -l) -eq 0 ]; then
@@ -102,8 +102,8 @@ ovs-vsctl add-port br0 dpdk1 -- set Interface dpdk1 type=dpdk options:dpdk-devar
 
 #Delete default flow and add two flows to forward packets between the physical devices.
 ovs-ofctl del-flows br0
-ovs-ofctl add-flow br0 in_port=10,action=11
-ovs-ofctl add-flow br0 in_port=11,action=10
+#ovs-ofctl add-flow br0 in_port=10,action=11
+#ovs-ofctl add-flow br0 in_port=11,action=10
 
 #add some ports for otherside
 ovs-vsctl add-port br0 vhost0 \
