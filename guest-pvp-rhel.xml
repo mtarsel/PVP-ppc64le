@@ -8,6 +8,12 @@
     </hugepages>
   </memoryBacking>
   <vcpu placement='static'>3</vcpu>
+    <cputune>
+    <vcpupin vcpu='0' cpuset='1'/>
+    <vcpupin vcpu='1' cpuset='6'/>
+    <vcpupin vcpu='2' cpuset='7'/>
+    <emulatorpin cpuset='0'/>
+  </cputune>
   <os>
     <type arch='ppc64le' machine='pseries'>hvm</type>
     <boot dev='hd'/>
@@ -16,8 +22,7 @@
   </os>
   <cpu>
     <numa>
-      <cell id='0' cpus='0' memory='1048576' unit='KiB' memAccess='shared'/>
-      <cell id='1' cpus='1' memory='1048576' unit='KiB' memAccess='shared'/>
+      <cell id='0' cpus='0-2' memory='3145728' unit='KiB' memAccess='shared'/>
     </numa>
   </cpu>
   <clock offset='utc'/>
@@ -42,22 +47,22 @@
       <mac address='00:16:3e:1a:b3:4a'/>
       <source network='default'/>
       <model type='virtio'/>
-      <address type='pci' domain='0x0000' bus='0x00' slot='0x08' function='0x0'/>
-    </interface>
-    <interface type='vhostuser'>
-      <mac address='52:54:00:33:fc:5e'/>
-      <source type='unix' path='/var/run/openvswitch/vhost0' mode='client'/>
-      <model type='virtio'/>
-      <driver name='vhost' queues='4'>
-        <host mrg_rxbuf='off'/>
-      </driver>
       <address type='pci' domain='0x0000' bus='0x00' slot='0x01' function='0x0'/>
     </interface>
     <interface type='vhostuser'>
-      <mac address='52:54:00:33:fc:5f'/>
+      <mac address='52:54:00:33:fc:01'/>
+      <source type='unix' path='/var/run/openvswitch/vhost0' mode='client'/>
+      <model type='virtio'/>
+      <driver name='vhost' queues='3'>
+        <host mrg_rxbuf='off'/>
+      </driver>
+      <address type='pci' domain='0x0000' bus='0x00' slot='0x08' function='0x0'/>
+    </interface>
+    <interface type='vhostuser'>
+      <mac address='52:54:00:33:fc:02'/>
       <source type='unix' path='/var/run/openvswitch/vhost1' mode='client'/>
       <model type='virtio'/>
-      <driver name='vhost' queues='4'>
+      <driver name='vhost' queues='3'>
         <host mrg_rxbuf='off'/>
       </driver>
       <address type='pci' domain='0x0000' bus='0x00' slot='0x07' function='0x0'/>
