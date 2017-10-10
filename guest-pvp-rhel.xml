@@ -33,7 +33,7 @@
     <emulator>/usr/libexec/qemu-kvm</emulator>
     <disk type='file' device='disk'>
       <driver name='qemu' type='raw'/>
-      <source file='/home/gowri/rhel-74pvp.img'/>
+      <source file='/home/gowri/rhel-74pvpMick.img'/>
       <target dev='vda' bus='virtio'/>
     </disk>
     <disk type='file' device='cdrom'>
