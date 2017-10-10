@@ -1,13 +1,13 @@
 <domain type='kvm'>
   <name>pvp</name>
-  <memory unit='KiB'>2097152</memory>
-  <currentMemory unit='KiB'>2097152</currentMemory>
+  <memory unit='KiB'>3145728</memory>
+  <currentMemory unit='KiB'>3145728</currentMemory>
   <memoryBacking>
     <hugepages>
-      <page size='16384' unit='KiB' nodeset='0-1'/>
+      <page size='1048576' unit='KiB' nodeset='0'/>
     </hugepages>
   </memoryBacking>
-  <vcpu placement='static'>4</vcpu>
+  <vcpu placement='static'>3</vcpu>
   <os>
     <type arch='ppc64le' machine='pseries'>hvm</type>
     <boot dev='hd'/>
@@ -28,7 +28,7 @@
     <emulator>/usr/libexec/qemu-kvm</emulator>
     <disk type='file' device='disk'>
       <driver name='qemu' type='raw'/>
-      <source file='/home/gowri/rhel-74.img'/>
+      <source file='/home/gowri/rhel-74pvp.img'/>
       <target dev='vda' bus='virtio'/>
     </disk>
     <disk type='file' device='cdrom'>
